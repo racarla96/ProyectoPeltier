@@ -22,15 +22,27 @@ function build_pcode(varargin)
         files = varargin;
     end
 
-    outDir = fullfile(fileparts(mfilename('fullpath')), 'pcode');
+    srcDir = fileparts(mfilename('fullpath'));
+    outDir = fullfile(srcDir, 'pcode');
     if ~exist(outDir, 'dir')
         mkdir(outDir);
     end
 
-    for i = 1:numel(files)
-        pcode(files{i}, '-outdir', outDir);
-        fprintf('Generado: %s\n', fullfile(outDir, strrep(files{i}, '.m', '.p')));
+    % pcode no soporta '-outdir': escribe siempre en el directorio actual.
+    % Nos movemos temporalmente a outDir y le pasamos la ruta absoluta
+    % del .m de origen.
+    oldDir = pwd;
+    cd(outDir);
+    try
+        for i = 1:numel(files)
+            pcode(fullfile(srcDir, files{i}));
+            fprintf('Generado: %s\n', fullfile(outDir, strrep(files{i}, '.m', '.p')));
+        end
+    catch ME
+        cd(oldDir);
+        rethrow(ME);
     end
+    cd(oldDir);
 
     fprintf('\nListos en: %s\n', outDir);
     fprintf('Para usarlos: anade esa carpeta al path de MATLAB (addpath) en vez de, o ademas de, la carpeta con los .m originales.\n');
