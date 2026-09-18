@@ -1,0 +1,4 @@
+firmware/build/
+*.uf2
+*.elf
+*.o
