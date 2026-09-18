@@ -59,6 +59,19 @@ caliente.
 
 4. Abre el modelo, ajusta `Port` en el bloque `RP2040_Plant` y simula.
 
+### 2.1 Distribuir sin código fuente en claro (opcional)
+
+Para compartir `ThermalPlantInterface.m` sin exponer el `.m` legible:
+
+```matlab
+build_pcode
+```
+
+Genera `ThermalPlantInterface.p` en `matlab/pcode/`. Añade esa carpeta al
+path en vez de (o además de) la carpeta con el `.m` original — Simulink
+resuelve el `.p` de forma transparente, sin cambios en el modelo. Nota:
+`pcode` es solo ofuscación (bytecode de MATLAB), no cifrado fuerte.
+
 ## 3. Siguiente paso (Fase 2)
 
 Sustituir en el firmware `thermal_model_step()` por lecturas reales de
