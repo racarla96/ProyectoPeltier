@@ -61,16 +61,22 @@ caliente.
 
 ### 2.1 Distribuir sin código fuente en claro (opcional)
 
-Para compartir `ThermalPlantInterface.m` sin exponer el `.m` legible:
+Para generar un paquete listo para entregar a un tercero sin exponer
+`ThermalPlantInterface.m` en claro (los `.m` originales del repo no se
+tocan ni se borran):
 
 ```matlab
 build_pcode
 ```
 
-Genera `ThermalPlantInterface.p` en `matlab/pcode/`. Añade esa carpeta al
-path en vez de (o además de) la carpeta con el `.m` original — Simulink
-resuelve el `.p` de forma transparente, sin cambios en el modelo. Nota:
-`pcode` es solo ofuscación (bytecode de MATLAB), no cifrado fuerte.
+Crea `matlab/dist/` con:
+- `ThermalPlantInterface.p` (ofuscado)
+- `build_thermal_model.m` (copiado tal cual; no es sensible)
+
+Quien reciba esa carpeta solo tiene que añadirla a su path de MATLAB y
+ejecutar `build_thermal_model` — el bloque `MATLAB System` resuelve el
+`.p` igual que resolvería el `.m`, sin tocar el modelo. Nota: `pcode` es
+solo ofuscación (bytecode de MATLAB), no cifrado fuerte.
 
 ## 3. Siguiente paso (Fase 2)
 

@@ -2,3 +2,6 @@ firmware/build/
 *.uf2
 *.elf
 *.o
+matlab/dist/
+matlab/pcode/
+*.p

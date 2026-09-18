@@ -1,29 +1,41 @@
 function build_pcode(varargin)
-% build_pcode  Genera versiones .p (ofuscadas via MATLAB pcode) de los
-%   archivos fuente que se quieran distribuir sin exponer el codigo en
-%   claro (p.ej. para compartir el bloque de interfaz con la RP2040 sin
-%   dar el .m legible).
+% build_pcode  Genera un paquete de distribucion en matlab/dist/ con el
+%   codigo ofuscado (pcode) mas los archivos que sí necesita quien reciba
+%   el paquete para construir y correr el modelo.
 %
-%   Los .p resultantes se comportan igual que los .m originales: el
-%   bloque MATLAB System de Simulink (y cualquier llamada que use
-%   'ThermalPlantInterface') los resuelve automaticamente si estan en
-%   el path, sin cambios en el modelo.
+%   No modifica ni borra los .m originales: estos siguen siendo la
+%   fuente de verdad en el repositorio. El paquete de dist/ es un
+%   subproducto de build, pensado para entregar a terceros sin exponer
+%   ThermalPlantInterface.m en claro.
+%
+%   Contenido de matlab/dist/ tras ejecutar esto:
+%     - ThermalPlantInterface.p   (ofuscado, sin el .m)
+%     - build_thermal_model.m     (copiado tal cual, código no sensible)
+%
+%   El bloque MATLAB System de Simulink (y build_thermal_model, que lo
+%   referencia por nombre 'ThermalPlantInterface') resuelve el .p de
+%   forma transparente si esa carpeta esta en el path: no hace falta
+%   tocar el modelo ni el script.
 %
 %   Nota: pcode NO es cifrado fuerte, solo ofuscacion (bytecode de
 %   MATLAB). No lo uses como unica proteccion si el codigo es sensible.
 %
 %   Uso:
 %       build_pcode
-%       build_pcode('ThermalPlantInterface.m')
+%       build_pcode('ThermalPlantInterface.m')   % archivos a ofuscar
 
     if isempty(varargin)
-        files = {'ThermalPlantInterface.m'};
+        filesToObfuscate = {'ThermalPlantInterface.m'};
     else
-        files = varargin;
+        filesToObfuscate = varargin;
     end
 
+    % Archivos que se copian sin ofuscar porque quien recibe el paquete
+    % los necesita para construir/ejecutar el modelo.
+    filesToCopyPlain = {'build_thermal_model.m'};
+
     srcDir = fileparts(mfilename('fullpath'));
-    outDir = fullfile(srcDir, 'pcode');
+    outDir = fullfile(srcDir, 'dist');
     if ~exist(outDir, 'dir')
         mkdir(outDir);
     end
@@ -34,9 +46,9 @@ function build_pcode(varargin)
     oldDir = pwd;
     cd(outDir);
     try
-        for i = 1:numel(files)
-            pcode(fullfile(srcDir, files{i}));
-            fprintf('Generado: %s\n', fullfile(outDir, strrep(files{i}, '.m', '.p')));
+        for i = 1:numel(filesToObfuscate)
+            pcode(fullfile(srcDir, filesToObfuscate{i}));
+            fprintf('Ofuscado: %s\n', fullfile(outDir, strrep(filesToObfuscate{i}, '.m', '.p')));
         end
     catch ME
         cd(oldDir);
@@ -44,6 +56,11 @@ function build_pcode(varargin)
     end
     cd(oldDir);
 
-    fprintf('\nListos en: %s\n', outDir);
-    fprintf('Para usarlos: anade esa carpeta al path de MATLAB (addpath) en vez de, o ademas de, la carpeta con los .m originales.\n');
+    for i = 1:numel(filesToCopyPlain)
+        copyfile(fullfile(srcDir, filesToCopyPlain{i}), outDir);
+        fprintf('Copiado:  %s\n', fullfile(outDir, filesToCopyPlain{i}));
+    end
+
+    fprintf('\nPaquete de distribucion listo en: %s\n', outDir);
+    fprintf('Entregalo entero; quien lo reciba solo tiene que anadirlo al path de MATLAB y ejecutar build_thermal_model.\n');
 end
