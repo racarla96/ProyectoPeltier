@@ -15,6 +15,11 @@ Ts = 0.01; % 100 Hz, igual que la planta
 
 set_param(modelName, 'Solver', 'FixedStepDiscrete', 'FixedStep', num2str(Ts));
 
+% Pacing a tiempo real (1 s de simulacion = 1 s de reloj): necesario en
+% HIL para no desincronizarse de la RP2040, que corre a 100 Hz reales.
+set_param(modelName, 'SimulationPacing', 'on');
+set_param(modelName, 'SimulationPacingRate', 1);
+
 % --- Referencia de temperatura ---
 add_block('simulink/Sources/Constant', modelName + "/T_ref", ...
     'Value', '15', 'Position', [30 100 80 130]);
