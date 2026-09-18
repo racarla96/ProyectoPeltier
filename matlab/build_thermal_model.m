@@ -47,6 +47,8 @@ add_block('simulink/User-Defined Functions/MATLAB System', ...
     modelName + "/RP2040_Plant", ...
     'Position', [460 60 620 200]);
 set_param(modelName + "/RP2040_Plant", 'System', 'ThermalPlantInterface');
+% serialport no soporta generacion de codigo: forzar ejecucion interpretada.
+set_param(modelName + "/RP2040_Plant", 'SimulateUsing', 'Interpreted execution');
 
 % --- Realimentacion: T_c es la variable controlada ---
 add_line(modelName, 'T_ref/1', 'Error/1');
