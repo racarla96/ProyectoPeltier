@@ -20,6 +20,10 @@ set_param(modelName, 'Solver', 'FixedStepDiscrete', 'FixedStep', num2str(Ts));
 set_param(modelName, 'EnablePacing', 'on');
 set_param(modelName, 'PacingRate', '1');
 
+% Duracion del experimento HIL: 5 minutos reales (StopTime en segundos
+% de simulacion; con pacing a 1x equivale a 5 min de reloj).
+set_param(modelName, 'StopTime', '300');
+
 % --- Referencia de temperatura ---
 add_block('simulink/Sources/Constant', modelName + "/T_ref", ...
     'Value', '15', 'Position', [30 100 80 130]);
